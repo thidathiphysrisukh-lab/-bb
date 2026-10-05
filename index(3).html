@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AR กระต่ายบนดวงจันทร์</title>
+
+  <!-- A-Frame -->
+  <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+
+  <!-- AR.js -->
+  <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: Arial, sans-serif;
+    }
+
+    #info {
+      position: fixed;
+      top: 15px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      color: white;
+      background: rgba(0,0,0,.65);
+      padding: 10px 18px;
+      border-radius: 20px;
+      font-size: 15px;
+      text-align: center;
+      pointer-events: none;
+    }
+  </style>
+
+  <script>
+    // กระต่ายกระพริบ/ขยับตัวเล็กน้อย
+    AFRAME.registerComponent('rabbit-animation', {
+      schema: {
+        speed: {default: 1}
+      },
+
+      init: function () {
+        this.startY = this.el.object3D.position.y;
+        this.time = 0;
+      },
+
+      tick: function (time, deltaTime) {
+        this.time += deltaTime * 0.001 * this.data.speed;
+
+        // ลอยขึ้นลงเบา ๆ
+        this.el.object3D.position.y =
+          this.startY + Math.sin(this.time * 2) * 0.025;
+
+        // ขยับหูเล็กน้อย
+        const earL = this.el.querySelector('#earL');
+        const earR = this.el.querySelector('#earR');
+
+        if (earL && earR) {
+          earL.object3D.rotation.z = Math.sin(this.time * 2.5) * 0.08;
+          earR.object3D.rotation.z = -Math.sin(this.time * 2.5) * 0.08;
+        }
+      }
+    });
+  </script>
+</head>
+
+<body>
+
+  <div id="info">
+    🔭 ส่องกล้องไปที่ Hiro Marker เพื่อพบกระต่ายบนดวงจันทร์ 🌙🐇
+  </div>
+
+  <a-scene
+    embedded
+    vr-mode-ui="enabled: false"
+    renderer="antialias: true; alpha: true"
+    arjs="sourceType: webcam; debugUIEnabled: false; trackingMethod: best;">
+
+    <!-- Hiro Marker -->
+    <a-marker
+      preset="hiro"
+      smooth="true"
+      smoothCount="10"
+      smoothTolerance="0.01"
+      smoothThreshold="5">
+
+      <!-- ดวงจันทร์ -->
+      <a-entity position="0 0.55 0">
+
+        <!-- ทรงกลมดวงจันทร์ -->
+        <a-sphere
+          radius="0.62"
+          color="#d8d8d8"
+          material="roughness: 1; metalness: 0"
+          scale="1 0.55 1">
+        </a-sphere>
+
+        <!-- หลุมบนดวงจันทร์ -->
+        <a-cylinder
+          position="-0.28 0.02 0.15"
+          rotation="90 0 0"
+          radius="0.12"
+          height="0.012"
+          color="#b5b5b5">
+        </a-cylinder>
+
+        <a-cylinder
+          position="0.18 0.02 0.25"
+          rotation="90 0 0"
+          radius="0.09"
+          height="0.012"
+          color="#b8b8b8">
+        </a-cylinder>
+
+        <a-cylinder
+          position="0.30 0.03 -0.15"
+          rotation="90 0 0"
+          radius="0.07"
+          height="0.012"
+          color="#aaa">
+        </a-cylinder>
+
+      </a-entity>
+
+      <!-- =========================
+           กระต่ายสีขาว
+           ========================= -->
+      <a-entity
+        id="rabbit"
+        position="0 1.35 0"
+        rabbit-animation>
+
+        <!-- ลำตัว -->
+        <a-sphere
+          position="0 0 0"
+          radius="0.27"
+          color="#ffffff"
+          material="roughness: 0.9">
+        </a-sphere>
+
+        <!-- หัว -->
+        <a-sphere
+          position="0 0.38 0"
+          radius="0.23"
+          color="#ffffff"
+          material="roughness: 0.9">
+        </a-sphere>
+
+        <!-- หูซ้าย -->
+        <a-cylinder
+          id="earL"
+          position="-0.12 0.67 0"
+          radius="0.055"
+          height="0.38"
+          color="#ffffff"
+          rotation="0 0 -8">
+        </a-cylinder>
+
+        <!-- หูขวา -->
+        <a-cylinder
+          id="earR"
+          position="0.12 0.67 0"
+          radius="0.055"
+          height="0.38"
+          color="#ffffff"
+          rotation="0 0 8">
+        </a-cylinder>
+
+        <!-- ด้านในหู -->
+        <a-cylinder
+          position="-0.12 0.68 -0.057"
+          radius="0.025"
+          height="0.27"
+          color="#ffb6c9"
+          rotation="0 0 -8">
+        </a-cylinder>
+
+        <a-cylinder
+          position="0.12 0.68 -0.057"
+          radius="0.025"
+          height="0.27"
+          color="#ffb6c9"
+          rotation="0 0 8">
+        </a-cylinder>
+
+        <!-- ตาซ้าย -->
+        <a-sphere
+          position="-0.085 0.42 -0.205"
+          radius="0.035"
+          color="#222222">
+        </a-sphere>
+
+        <!-- ตาขวา -->
+        <a-sphere
+          position="0.085 0.42 -0.205"
+          radius="0.035"
+          color="#222222">
+        </a-sphere>
+
+        <!-- จมูก -->
+        <a-sphere
+          position="0 0.35 -0.225"
+          radius="0.025"
+          color="#ff91aa">
+        </a-sphere>
+
+        <!-- หาง -->
+        <a-sphere
+          position="0 0.02 0.27"
+          radius="0.12"
+          color="#ffffff">
+        </a-sphere>
+
+        <!-- ขาหน้า -->
+        <a-cylinder
+          position="-0.13 -0.20 -0.08"
+          radius="0.055"
+          height="0.22"
+          color="#ffffff"
+          rotation="0 0 -10">
+        </a-cylinder>
+
+        <a-cylinder
+          position="0.13 -0.20 -0.08"
+          radius="0.055"
+          height="0.22"
+          color="#ffffff"
+          rotation="0 0 10">
+        </a-cylinder>
+
+        <!-- เท้า -->
+        <a-sphere
+          position="-0.16 -0.30 -0.04"
+          radius="0.09"
+          color="#ffffff"
+          scale="1 0.55 1.3">
+        </a-sphere>
+
+        <a-sphere
+          position="0.16 -0.30 -0.04"
+          radius="0.09"
+          color="#ffffff"
+          scale="1 0.55 1.3">
+        </a-sphere>
+
+      </a-entity>
+
+      <!-- =========================
+           ดาวรอบดวงจันทร์
+           ========================= -->
+      <a-sphere position="-1 1.2 -0.5" radius="0.035" color="#fff5a8"></a-sphere>
+      <a-sphere position="1 0.9 -0.4" radius="0.025" color="#ffffff"></a-sphere>
+      <a-sphere position="-0.8 0.3 -0.6" radius="0.025" color="#aee8ff"></a-sphere>
+      <a-sphere position="0.9 1.5 -0.5" radius="0.035" color="#fff5a8"></a-sphere>
+      <a-sphere position="0.5 0.2 -0.8" radius="0.022" color="#ffffff"></a-sphere>
+      <a-sphere position="-1.1 1.7 -0.2" radius="0.025" color="#aee8ff"></a-sphere>
+
+      <!-- แสง -->
+      <a-light
+        type="ambient"
+        color="#ffffff"
+        intensity="1.2">
+      </a-light>
+
+      <a-light
+        type="point"
+        color="#dcecff"
+        intensity="2"
+        distance="5"
+        position="0 2 1">
+      </a-light>
+
+    </a-marker>
+
+    <!-- กล้อง AR -->
+    <a-entity camera></a-entity>
+
+  </a-scene>
+
+</body>
+</html>
